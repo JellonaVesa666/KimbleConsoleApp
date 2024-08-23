@@ -1,6 +1,6 @@
 ﻿public sealed class Dice
 {
-    public int? Value { get; set; } = null;
+    public int Value { get; set; }
 
     public Dice()
     {

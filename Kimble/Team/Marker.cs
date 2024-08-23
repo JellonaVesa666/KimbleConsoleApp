@@ -3,9 +3,9 @@
 public class Position
 {
     // Global position is used to compare markers positions between teams.
-    public int? Global { get; set; } = null;
+    public int Global { get; set; }
     // Local position is used for checking lap progress for marker.
-    public int? Local { get; set; } = null;
+    public int Local { get; set; }
 
     public Position()
     {
@@ -16,9 +16,9 @@ public class Position
 
 public class Marker
 {
-    public string? Name { get; set; } = null;
-    public Position? Pos { get; set; } = new();
-    public int? GoalSlot { get; set; } = null;
+    public string Name { get; set; }
+    public Position Pos { get; set; }
+    public int GoalSlot { get; set; }
 
     public Marker(string name)
     {

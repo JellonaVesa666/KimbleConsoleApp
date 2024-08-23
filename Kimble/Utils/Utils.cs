@@ -63,7 +63,9 @@ public class Utils
 
     public static void SaveStatistics(Game game, Team team)
     {
-        string statisticsPath = $"{projectPath}" + @"\Logs\Statistics.json";
+        CreateFolder($"{projectPath}" + @"\Logs");
+
+        string statisticsPath = $"{ projectPath}" + @"\Logs\Statistics.json";
         JObject statisticsJObject = GetJObject(statisticsPath);
 
         JObject? saveObject = null;
@@ -179,5 +181,15 @@ public class Utils
                 }
             }
         }
+    }
+
+    public static void CreateFolder (string path)
+    {
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
+        return;
     }
 }

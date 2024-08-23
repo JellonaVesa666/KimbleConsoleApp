@@ -40,6 +40,8 @@ public class Alerts
 
     public static void LogStatisticAlert(StatisticAlert alert, Team team, Statistics statistics)
     {
+        CreateFolder($"{projectPath}" + @"\Logs");
+
         string statisticsPath = $"{projectPath}" + @"\Logs\Statistics.json";
         JObject statisticsJObject = GetJObject(statisticsPath);
 

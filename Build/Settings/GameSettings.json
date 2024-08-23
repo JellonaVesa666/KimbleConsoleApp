@@ -1,0 +1,35 @@
+// Preset for 4 players
+{
+  "LapSize": 28,
+  "GoalSlots": 4,
+  "TeamsCount": 4,
+  "TeamMarkers": 4,
+  "TeamRiskTaking": [
+    {
+      "Red": 0.5
+    },
+    {
+      "Green": 0.5
+    },
+    {
+      "Blue": 0.5
+    },
+    {
+      "Yellow": 0.5
+    }
+  ],
+  "TeamSkills": [
+    {
+      "Red": [ 0, 1, 2 ]
+    },
+    {
+      "Green": [ 1 ]
+    },
+    {
+      "Blue": [ 1, 2 ]
+    },
+    {
+      "Yellow": [ 0 ]
+    }
+  ]
+}

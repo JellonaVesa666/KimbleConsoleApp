@@ -28,7 +28,7 @@ public class Game
         Update = false;
         State = global::State.Roll;
 
-        Iterations = settings.Iterations + 1;
+        Iterations = settings.Iterations;
         LapSize = settings.LapSize;
         TeamsCount = settings.TeamsCount;
 

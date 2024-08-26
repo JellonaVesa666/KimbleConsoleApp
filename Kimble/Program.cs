@@ -219,7 +219,7 @@ internal class Program
                         break;
                 }
             }
-            if (game.Iterations > 0 && !game.Update)
+            if (game.Iterations >= 0 && !game.Update)
             {
                 SetTeams();
                 SetStartTeam();

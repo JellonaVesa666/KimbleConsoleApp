@@ -3,6 +3,7 @@
 <br />
 <div align="center">
   <h3 align="center">Kimble Console App</h3>
+  <h4 align="center">Vesa Runtti / 26.08.2024</h4>
 </div>
 
 
@@ -23,7 +24,7 @@
         <li><a href="#prerequisites">Prerequisites</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <li><a href="#running">Running</a></li>
   </ol>
 </details>
 
@@ -58,6 +59,7 @@ Project requires to have a GameSetting.json file inside Settings folder but this
 * GameSetting.json
   ```sh
   {
+    "Iterations": 20,
     "LapSize": 28,
     "GoalSlots": 4,
     "TeamsCount": 4,
@@ -74,26 +76,27 @@ Project requires to have a GameSetting.json file inside Settings folder but this
         {"Blue": [ 1, 2 ]},
         {"Yellow": [ 0 ]}
       ]
-  }```
+  }
+  ```
 
-<!-- USAGE EXAMPLES -->
-## Usage
-
+#### Iterations
+##### Accepted values, not tested...
+- How many iterations of game will be run.
 #### Lapsize
-#### Accepted values, not tested...
+##### Accepted values, not tested...
 - Kimble board ring size, usually 28 slots.
 #### GoalSlots
-#### Accepted values, not tested...
+##### Accepted values, not tested...
 - Goal slots foreach team, usually 4 slots.
 #### TeamsCount
-#### Accepted values, not tested...
+##### Accepted values, not tested...
 - Teams count, usually 4 teams.
 #### TeamMarkers
-#### Accepted values, not tested...
+##### Accepted values, not tested...
 - Team markers/pieces count, usually 4 markers.
 
 #### TeamRiskTaking
-#### Accepted value range 0 - 1
+##### Accepted values | 0f - 1f
 0. Min risk taking.<br/>
 Always avoid spawning new markers on board if other team marker in range.
 
@@ -101,7 +104,7 @@ Always avoid spawning new markers on board if other team marker in range.
 Always spawn no matter how close other team marker is.
 
 ### TeamSkills
-#### Accepted single values 0 - 1 - 2
+##### Accepted values | [ ] -0 - 1 - 2
 0. "MarkerEater"<br/>
 Tries to eat other team markers when possible.
 
@@ -112,14 +115,46 @@ Tries to eat other team marker is current team spawn slot.
 Avoid spawning marker when chance to get eaten is higher than risk taking float.
 
 
-
-<!-- USAGE EXAMPLES -->
 ## Running
 
-In order to run solution you will have to have Visual Studio installed. Launching solution is straight forward navigate to repository root folder and open "Kimble_Solution.sln". Opening solution should launch Visual Studio as solution opened. After Visual Studio is open hit F5 or use Start, button to launch solution inside Visual Studio.
+### Solution
+
+Kimble_Solution.sln
+
+- Found inside "Kimble" folder at repository root. In order to run solution you will have to have Visual Studio installed. To run solution inside Visual Studio double click solution to open it inside Visual Studio, press F5 or use Start button inside Visual Studio to run solution.
+
+### Build
+Kimble.exe 
+
+- Found inside "Build" folder at repository root.
 
 
-Kimble.exe can be also launched from project root by navigating inside "Build" folder and launching "Kimble.exe"
+## Logs
+
+### Statistics
+
+After running build or solution, application should create a "Logs" folder which has game statistics as in JSON format for later viewing. JSON is regenerated after each run so it wont save data from multiple runs.
+
+* Statistics.json
+  ```sh
+  {
+    "gameCount": 20,
+    "AverageTurnCount": 256,
+    "AverageEatCount": 10,
+    "AverageSpawnCount": 23,
+    "AverageMoveCount": 133,
+    "turnCount": 5136,
+    "eatCount": 207,
+    "spawnCount": 474,
+    "moveCount": 2671,
+    "wins": {
+      "Red": 11,
+      "Green": 4,
+      "Blue": 2,
+      "Yellow": 4
+    }
+  }
+  ```
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

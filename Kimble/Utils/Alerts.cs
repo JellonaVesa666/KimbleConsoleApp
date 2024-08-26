@@ -1,10 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
-using static Utils;
-using static Globals;
 
 public class Alerts
 {
-
     public enum MarkerAlert
     {
         Spawn,
@@ -15,7 +12,7 @@ public class Alerts
 
     public enum StatisticAlert
     {
-        Win
+        EndStatistics
     }
 
     public static void LogMarkerAlert(MarkerAlert alert, Marker? marker)
@@ -38,45 +35,28 @@ public class Alerts
         }
     }
 
-    public static void LogStatisticAlert(StatisticAlert alert, Team team, Statistics statistics)
+    public static void LogStatisticAlert(StatisticAlert alert, Statistics statistics)
     {
-        CreateFolder($"{projectPath}" + @"\Logs");
-
-        string statisticsPath = $"{projectPath}" + @"\Logs\Statistics.json";
-        JObject statisticsJObject = GetJObject(statisticsPath);
-
-        if (alert == StatisticAlert.Win)
+        if (alert == StatisticAlert.EndStatistics)
         {
-            Statistics totalStatistics = new Statistics(
-                  gameCount: statisticsJObject.Value<int>("gameCount"),
-                  turnCount: statisticsJObject.Value<int>("turnCount"),
-                  eatCount: statisticsJObject.Value<int>("eatCount"),
-                  spawnCount: statisticsJObject.Value<int>("spawnCount"),
-                  moveCount: statisticsJObject.Value<int>("moveCount"),
-                  wins: statisticsJObject["wins"].ToObject<int[]>()
-            );
+            var wins  = statistics.Wins.OrderBy(x => x.Value).Reverse().ToArray();
 
+            Console.WriteLine($"\n----------Game Count {statistics.GameCount}-----------");
 
-            int averageTurnCount = totalStatistics.TurnCount / totalStatistics.GameCount;
-            int averageEatCount = totalStatistics.EatCount / totalStatistics.GameCount;
-            int averageSpawnCount = totalStatistics.SpawnCount / totalStatistics.GameCount;
-            int averageMoveCount = totalStatistics.MoveCount / totalStatistics.GameCount;
-
-
-            Console.WriteLine("\n-------------Winner--------------");
-            Console.WriteLine($"Team {team.Color} has won the game !");
-            Console.WriteLine("\n----------Game Statistics-----------");
+            Console.WriteLine("\n----------Average Statistics-----------");
+            Console.WriteLine($"Turn count:{statistics.TurnCount / statistics.GameCount}");
+            Console.WriteLine($"Spawns count:{statistics.SpawnCount / statistics.GameCount}");
+            Console.WriteLine($"Move count:{statistics.MoveCount / statistics.GameCount}");
+            Console.WriteLine($"Eat count:{statistics.EatCount / statistics.GameCount}");
+            
+            Console.WriteLine("\n----------Total Statistics-----------");
             Console.WriteLine($"Turn count:{statistics.TurnCount}");
             Console.WriteLine($"Spawns count:{statistics.SpawnCount}");
             Console.WriteLine($"Move count:{statistics.MoveCount}");
             Console.WriteLine($"Eat count:{statistics.EatCount}");
 
-            Console.WriteLine("\n----------Total Statistics-----------");
-            Console.WriteLine($"Total games:{totalStatistics.GameCount}");
-            Console.WriteLine($"Average turn count per game:{averageTurnCount}");
-            Console.WriteLine($"Average move count per game:{averageMoveCount}");
-            Console.WriteLine($"Average spawn count per game:{averageSpawnCount}");
-            Console.WriteLine($"Average eat count per game:{averageEatCount}");
+            Console.WriteLine("\n----------Wins By Team-----------");
+            foreach (var win in wins) Console.WriteLine(win);
         }
     }
 }

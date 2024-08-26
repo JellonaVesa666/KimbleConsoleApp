@@ -11,25 +11,26 @@ internal class Program
 
     static void Main(string[] args)
     {
-        Initialize();
-        CheckComponents();
+        InitProjectPath();
+
+        InitSettings();
+        InitGame();
+        InitDice();
+        InitStatistics();
+
+        SetTeams();
+        SetStartTeam();
+
         OnStart();
+
         OnUpdate();
     }
 
-    /// <summary>
-    /// Initialize essential data and components.
-    /// </summary>
-    public static void Initialize()
+    private static void InitSettings()
     {
-        // Set Project Path
-        projectPath = GetProjectPath();
-
-
-
-        if (projectPath == null)
+        if (!File.Exists($"{projectPath}" + @"\Settings\GameSettings.json"))
         {
-            LogError("Could not find solution path");
+            LogError("GameSetting.json doesn't exist");
             ExitApplication();
         }
 
@@ -45,7 +46,7 @@ internal class Program
 
         foreach (var item in settingsJObject)
         {
-            string[] settingsProps = ["LapSize", "GoalSlots", "TeamsCount", "TeamMarkers", "TeamRiskTaking", "TeamSkills"];
+            string[] settingsProps = ["Iterations", "LapSize", "GoalSlots", "TeamsCount", "TeamMarkers", "TeamRiskTaking", "TeamSkills"];
             bool match = settingsProps.FirstOrDefault(props => props == item.Key && item.Value != null).Length > 0;
 
             if (!match)
@@ -57,6 +58,7 @@ internal class Program
 
         // Set Settings
         settings = new(
+            iterations: settingsJObject.Value<int>("Iterations"),
             lapSize: settingsJObject.Value<int>("LapSize"),
             goalSlots: settingsJObject.Value<int>("GoalSlots"),
             teamsCount: settingsJObject.Value<int>("TeamsCount"),
@@ -64,10 +66,26 @@ internal class Program
             teamRiskTaking: settingsJObject["TeamRiskTaking"].ToObject<List<Dictionary<string, float>>>(),
             teamSkills: settingsJObject["TeamSkills"].ToObject<List<Dictionary<string, int[]>>>()
         );
+    }
 
-        // Set Game
+    private static void InitGame() 
+    {
         game = new(settings);
+    }
 
+    public static void InitDice()
+    {
+        dice = new();
+    }
+
+    private static void InitStatistics()
+    {
+        statistics = new(game.TeamsCount);
+        
+    }
+
+    private static void SetTeams()
+    {
         // Set Teams
         _teams = new();
         for (int i = 0; i < game.TeamsCount; i++)
@@ -75,9 +93,6 @@ internal class Program
             string color = ((Color)i).ToString();
             int[] teamSkills = settings.TeamSkills[i][color];
             float teamRiskTaking = settings.TeamRiskTaking[i][color];
-
-            Console.WriteLine(teamSkills);
-            Console.WriteLine(teamRiskTaking);
 
             int globalOffset = game.LapSize / game.TeamsCount * i;
             _teams[i] = new(
@@ -88,17 +103,23 @@ internal class Program
                 riskTaking: teamRiskTaking
             );
         }
+    }
 
-        // Set Dice
-        dice = new();
+    private static void SetStartTeam()
+    {
+        _team = game.GetStartTeam(_teams);
 
-        statistics = new();
+        if (_team == null)
+        {
+            LogError("Something went wrong when picking starting team");
+            ExitApplication();
+        }
     }
 
     /// <summary>
     /// Check initialization for essential components.
     /// </summary>
-    public static void CheckComponents()
+    private static void CheckComponents()
     {
         // Check essential components, naive check
         if (projectPath == null ||
@@ -116,15 +137,12 @@ internal class Program
     /// <summary>
     /// Game start, setup.
     /// </summary>
-    public static void OnStart()
+    private static void OnStart()
     {
-        _team = game.PickTeam(_teams);
+        // Check components and data, naive check
+        CheckComponents();
 
-        if (_team == null)
-        {
-            LogError("Something went wrong when picking starting team");
-            ExitApplication();
-        }
+        SetStartTeam();
 
         game.Start();
     }
@@ -132,64 +150,86 @@ internal class Program
     /// <summary>
     /// Game update, loop.
     /// </summary>
-    public static void OnUpdate()
+    private static void OnUpdate()
     {
-        while (game.Update && game.Turn < 5000)
+        while (game.Iterations > 0)
         {
-            switch (game.State)
+            while (game.Update && game.Turn < 5000)
             {
-                case State.Roll:
-                    dice.Roll();
-                    Console.WriteLine($"Roll:{dice.Value}");
-                    game.State = State.Thinking;
-                    break;
-
-                case State.Thinking:
-                    var result = Thinking();
-                    _activeMarker = result.Marker;
-                    game.State = result.State;
-                    break;
-
-                case State.Spawn:
-                    statistics.SpawnCount++;
-                    _activeMarker.Spawn(_team.StartSlot);
-                    LogMarkerAlert(MarkerAlert.Spawn, _activeMarker);
-                    CheckIntersect(_activeMarker);
-                    game.State = State.Roll;
-                    break;
-
-                case State.Move:
-                    statistics.MoveCount++;
-                    _activeMarker.Move(dice.Value);
-                    LogMarkerAlert(MarkerAlert.Move, _activeMarker);
-                    CheckIntersect(_activeMarker);
-                    game.State = State.EndTurn;
-                    break;
-
-                case State.Arrive:
-                    _activeMarker.Move(dice.Value);
-                    LogMarkerAlert(MarkerAlert.Goal, _activeMarker);
-                    game.State = State.EndTurn;
-                    break;
-
-                case State.EndTurn:
-                    ValidateMarkers(_teams, _team);
-                    if (_team.CheckWinCondition())
-                    {
-                        statistics.GameCount++;
-                        statistics.Wins[(int)_team.Color]++;
-                        SaveStatistics(game, _team);
-                        LogStatisticAlert(StatisticAlert.Win, _team, statistics);
-                        game.Stop();
+                switch (game.State)
+                {
+                    case State.Roll:
+                        dice.Roll();
+                        Console.WriteLine($"Roll:{dice.Value}");
+                        game.State = State.Thinking;
                         break;
-                    }
-                    game.NextTurn();
-                    statistics.TurnCount++;
-                    _team = game.PickTeam(_teams);
-                    game.State = State.Roll;
-                    break;
+
+                    case State.Thinking:
+                        var result = Thinking();
+                        _activeMarker = result.Marker;
+                        game.State = result.State;
+                        break;
+
+                    case State.Spawn:
+                        statistics.SpawnCount++;
+                        _activeMarker.Spawn(_team.StartSlot);
+                        LogMarkerAlert(MarkerAlert.Spawn, _activeMarker);
+                        CheckIntersect(_activeMarker);
+                        game.State = State.Roll;
+                        break;
+
+                    case State.Move:
+                        statistics.MoveCount++;
+                        _activeMarker.Move(dice.Value);
+                        LogMarkerAlert(MarkerAlert.Move, _activeMarker);
+                        CheckIntersect(_activeMarker);
+                        game.State = State.Validate;
+                        break;
+
+                    case State.Arrive:
+                        _activeMarker.Move(dice.Value);
+                        LogMarkerAlert(MarkerAlert.Goal, _activeMarker);
+                        game.State = State.Validate;
+                        break;
+
+                    case State.Validate:
+                        ValidateMarkers(_teams, _team);
+                        game.State = State.WinCheck;
+                        break;
+
+                    case State.WinCheck:
+                        if (_team.CheckWinCondition())
+                        {
+                            statistics.Wins[_team.Color]++;
+                            game.Iterate();
+                            game.Stop();
+                            break;
+                        }
+                        else
+                        {
+                            game.State = State.EndTurn;
+                            break;
+                        }
+
+                    case State.EndTurn:
+                        game.NextTurn();
+                        statistics.TurnCount++;
+                        _team = game.GetNextTeam(_teams);
+                        game.State = State.Roll;
+                        break;
+                }
+            }
+            if (game.Iterations > 0 && !game.Update)
+            {
+                SetTeams();
+                SetStartTeam();
+                statistics.GameCount++;
+                OnStart();
             }
         }
+
+        statistics.Save();
+        LogStatisticAlert(StatisticAlert.EndStatistics, statistics);
 
         ExitApplication();
     }
@@ -226,7 +266,7 @@ internal class Program
     /// Process dice roll, find next suitable state, depending on team skills and risk taking.
     /// </summary>
     /// <returns>State, Marker</returns>
-    public static (State State, Marker Marker) Thinking()
+    private static (State State, Marker Marker) Thinking()
     {
         // Skill logic releated to eating markers
         if (_team.HasMarkersOnBoard())
@@ -313,7 +353,7 @@ internal class Program
             }
         }
 
-        return (State.EndTurn, null);
+        return (State.Validate, null);
     }
 
     private static float SafeSpawn()

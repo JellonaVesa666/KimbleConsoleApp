@@ -1,5 +1,5 @@
-// Preset for 4 players
 {
+  "Iterations": 20,
   "LapSize": 28,
   "GoalSlots": 4,
   "TeamsCount": 4,

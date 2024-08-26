@@ -78,31 +78,60 @@ public class Team
         return Markers.Where(marker => marker.Pos.Local == 0).FirstOrDefault();
     }
 
+    /// <summary>
+    /// Check if team has a marker at the start slot
+    /// </summary>
+    /// <returns>bool</returns>
     public bool HasMarkerAtStartSlot()
     {
         return Markers.Where(marker => marker.Pos.Local == 1).Count() > 0;
     }
 
+    /// <summary>
+    /// Check if goal slot is already occupied by other marker in the team
+    /// </summary>
+    /// <param name="newPos"></param>
+    /// <returns></returns>
     public bool MoveSlotOccupied(int newPos)
     {
         return Markers.Where(marker => marker.Pos.Local == newPos).Count() > 0;
     }
 
+    /// <summary>
+    /// Check if goal slot is already occupied by other marker in the team
+    /// </summary>
+    /// <param name="slot"></param>
+    /// <returns>bool</returns>
     public bool GoalSlotOccupied(int slot)
     {
         return Markers.Where(marker => marker.GoalSlot == slot).Count() > 0;
     }
 
+    /// <summary>
+    /// Check if team has a skill
+    /// </summary>
+    /// <param name="skill"></param>
+    /// <returns>bool</returns>
     public bool HasSkill(Skill skill)
     {
         return Skills.Where(s => s == skill).Count() > 0;
     }
 
+    /// <summary>
+    /// Gets all team markers within the min and max range.
+    /// </summary>
+    /// <param name="minRange"></param>
+    /// <param name="maxRange"></param>
+    /// <returns>Marker[]</returns>
     public Marker[] GetMarkersInRange(int minRange, int maxRange)
     {
         return Markers.Where(marker => marker.Pos.Local >= minRange && marker.Pos.Local <= maxRange).ToArray();
     }
 
+    /// <summary>
+    /// Checks if team has all goal slots filled
+    /// </summary>
+    /// <returns>bool</returns>
     public bool CheckWinCondition()
     {
         return Markers.Where(marker => marker.AtGoal()).Count() == 4;

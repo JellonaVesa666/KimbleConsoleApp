@@ -133,7 +133,7 @@ Kimble.exe
 
 ### Statistics
 
-After running build or solution, application should create a "Logs" folder which has game statistics as in JSON format for later viewing. JSON is regenerated after each run so it wont save data from multiple runs.
+After running build or solution, application should create a "Logs" folder which has game statistics in JSON format for later viewing. JSON is regenerated after each run so it wont save data from multiple runs.
 
 * Statistics.json
   ```sh

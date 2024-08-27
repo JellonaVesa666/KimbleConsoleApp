@@ -45,6 +45,7 @@ A simple console app which replicates AI players behavior and logic until game i
 * C#
 * Visual Studio
 * LINQ
+* Newtonsoft.Json
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

@@ -109,7 +109,7 @@ Always spawn no matter how close other team marker is.
 Tries to eat other team markers when possible.
 
 1. "AmbushStart"<br/>
-Tries to eat other team marker is current team spawn slot.
+Tries to eat other team marker in current team spawn slot.
 
 2. "SafeStart"<br/>
 Avoid spawning marker when chance to get eaten is higher than risk taking float.
